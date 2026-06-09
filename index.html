@@ -1469,7 +1469,7 @@ function renderActiveCharts() {
     },
     options: {
       responsive: true, maintainAspectRatio: false, layout: { padding: { top: 15 } },
-      plugins: { legend: { position: 'top', labels: { font: { size: 10 } } }, datalabels: { display: true, font: { size: 10, weight: "bold" }, formatter: (v, ctx) => v } },
+      plugins: { legend: { position: 'top', labels: { font: { size: 10 } } }, datalabels: { display: true, font: { size: 10, weight: "bold" }, formatter: (v, ctx) => v }, tooltip: { callbacks: { label: function(ctx) { if (ctx.dataset.yAxisID === 'y2') return ctx.dataset.label + ': ' + ctx.raw + '%'; return ctx.dataset.label + ': ' + ctx.raw + '人'; } } } },
       scales: {
         x: { stacked: true, ticks: { font: { size: 10 }, color: '#333', maxRotation: 35 } },
         y: { stacked: true, position: 'left', beginAtZero: true, ticks: { font: { size: 10 }, color: '#333' } },
