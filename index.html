@@ -40,6 +40,19 @@
 
   #header-date { font-size: 11px; color: rgba(255,255,255,0.85); margin-top: 4px; }
 
+  /* === DATA CALIBER === */
+  #caliber-bar { background: #fff; border-bottom: 1px solid #e0e6ef; font-size: 10px; }
+  .caliber-toggle { cursor: pointer; padding: 6px 12px; color: #2c5ba8; font-weight: 600; font-size: 10px; display: flex; align-items: center; gap: 4px; user-select: none; }
+  .caliber-toggle:hover { color: #1a3a6b; background: #f0f5ff; }
+  .caliber-toggle .arrow { transition: transform 0.2s; font-size: 8px; }
+  .caliber-toggle.open .arrow { transform: rotate(90deg); }
+  .caliber-content { display: none; padding: 6px 12px 10px; background: #fafbfd; border-top: 1px solid #f0f2f8; line-height: 1.8; color: #555; }
+  .caliber-content.open { display: block; }
+  .caliber-content dl { margin: 0; }
+  .caliber-content dt { font-weight: 700; color: #1a3a6b; margin-top: 6px; font-size: 10px; }
+  .caliber-content dd { margin-left: 12px; font-size: 10px; color: #666; }
+  .caliber-content .highlight { color: #2c5ba8; font-weight: 600; }
+
   /* === AI SUMMARY === */
   #ai-summary { background: linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%); border-left: 4px solid #2c5ba8; margin: 10px 0 0; padding: 10px 0; border-radius: 6px; font-size: 11px; line-height: 1.7; }
 
@@ -182,6 +195,30 @@
       </div>
     </div>
     <div id="header-subtitle" style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px">数据刷新时间：2026-06-08；累计数据时间范围：2026/1/1-2026/6/8</div>
+  </div>
+</div>
+
+<div id="caliber-bar">
+  <div class="caliber-toggle" onclick="toggleCaliber()">
+    <span class="arrow">▶</span> 📐 数据口径说明（点击展开）
+  </div>
+  <div class="caliber-content" id="caliber-content">
+    <dl>
+      <dt>【时间范围】</dt>
+      <dd>2026年1月1日 ~ 2026年6月8日（累计数据），数据更新至最新可用日期。</dd>
+      <dt>【人员范围】</dt>
+      <dd>含 ZT（总部）、GF（海外）、体系外花名册中人员状态为<span class="highlight">"在职"或"试用"</span>的员工；不含已离职人员。</dd>
+      <dt>【新员工定义】</dt>
+      <dd><span class="highlight">2026年1月1日及以后入职</span>、且截至统计日仍在职的员工。</dd>
+      <dt>【老员工定义】</dt>
+      <dd><span class="highlight">2025年12月31日及以前入职</span>、且截至统计日仍在职的员工。</dd>
+      <dt>【编制统计】</dt>
+      <dd>含 ZT编制、GF编制、体系外编制、PBU财务编制。占编在职 = 编制表中编制在岗状态为"在职"且编制任职类型 ≠ "短期兼职"的岗位数。满编率 = 占编在职人数 ÷ 编制总数 × 100%。</dd>
+      <dt>【离职分类】</dt>
+      <dd><span class="highlight">主动离职</span>：离职类型为个人原因、发展因素、健康、家庭、创业、出国深造等。<br><span class="highlight">被动离职</span>：离职类型为人员优化、试用期不通过、法定解除、违纪、协商解除等。</dd>
+      <dt>【特殊处理】</dt>
+      <dd>二次入职人员：既计入当期在职，其历史离职也计入对应月份离职人数；短期兼职：不计入占编在职（满编率统计按空编处理），但在职人数含短期兼职。</dd>
+    </dl>
   </div>
 </div>
 
@@ -1083,6 +1120,22 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+/* ========== DATA CALIBER TOGGLE ========== */
+function toggleCaliber() {
+  const toggle = document.querySelector('.caliber-toggle');
+  const content = document.getElementById('caliber-content');
+  const isOpen = content.classList.contains('open');
+  if (isOpen) {
+    content.classList.remove('open');
+    toggle.classList.remove('open');
+    toggle.innerHTML = '<span class="arrow">▶</span> 📐 数据口径说明（点击展开）';
+  } else {
+    content.classList.add('open');
+    toggle.classList.add('open');
+    toggle.innerHTML = '<span class="arrow">▼</span> 📐 数据口径说明（点击收起）';
+  }
+}
+
 /* ========== TAB SWITCHING ========== */
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -1104,7 +1157,7 @@ function renderAISummary() {
   const rateRange = lowRates.length > 0 ? Math.min(...lowRates.map(r => parseInt(r))) + '%-' + Math.max(...lowRates.map(r => parseInt(r))) + '%' : '';
 
   let html = '';
-  html += '<div class="ai-item">集团在职<strong style="color:#2c5ba8">' + T.active.toLocaleString() + '人</strong>，整体<strong style="color:#2c5ba8">满编率' + T.fillRate + '%</strong>（编制' + T.staff + '，编制在岗' + T.filled + '），累计净增<strong style="color:#1a8a3a">+' + T.netGrowth + '人</strong>。</div>';
+  html += '<div class="ai-item">集团在职<strong style="color:#2c5ba8">' + T.active.toLocaleString() + '人</strong>，整体<strong style="color:#2c5ba8">满编率' + T.fillRate + '%</strong>（' + T.filled + '/' + T.staff + '），本年累计净增<strong style="color:#1a8a3a">+' + T.netGrowth + '人</strong>。</div>';
   html += '<div class="ai-item">累计入职<strong style="color:#2c5ba8">' + T.joined.toLocaleString() + '人</strong>（其中目前在职<strong style="color:#2c5ba8">' + T.newEmployee.toLocaleString() + '人</strong>），<strong style="color:#1a8a3a">留存率' + T.newRetentionRate + '%</strong>；累计离职<strong style="color:#CC0000">' + T.resigned.toLocaleString() + '人</strong>（主动离职<strong style="color:#CC0000">' + T.activeResign + '人</strong>，被动离职<strong style="color:#CC0000">' + T.passiveResign + '人</strong>），<strong style="color:#CC0000">离职率' + T.resignRate + '%</strong>。</div>';
   html += '<div class="ai-item">新老员工结构：新员工<strong style="color:#2c5ba8">' + T.newEmployee.toLocaleString() + '人（' + newEmpPct + '%）</strong>，老员工<strong style="color:#2c5ba8">' + T.oldEmployee.toLocaleString() + '人（' + oldEmpPct + '%）</strong>。</div>';
   html += '<div class="ai-item">⚠️ <strong style="color:#CC0000">关注</strong>：' + lowBUs + '满编率偏低（<strong style="color:#CC0000">' + rateRange + '</strong>），需重点加强招聘与人才保留。</div>';
@@ -1119,10 +1172,10 @@ function renderOverview() {
   // Row 1: 在职人数 + 净增
   function netCls(v) { return v >= 0 ? 'positive' : 'negative'; }
   function netSign(v) { return v >= 0 ? '+' + v : v; }
-  let r1 = '<div class="ov-card group-card blue-card"><div class="bu-name">集团</div><div class="big-num">' + TOTAL.active.toLocaleString() + '</div><div class="net-growth"><span class="net-label">累计净增</span><span class="' + netCls(TOTAL.netGrowth) + '">' + netSign(TOTAL.netGrowth) + '</span></div></div>';
+  let r1 = '<div class="ov-card group-card blue-card"><div class="bu-name">集团</div><div class="big-num">' + TOTAL.active.toLocaleString() + '</div><div class="net-growth"><span class="net-label">本年累计净增</span><span class="' + netCls(TOTAL.netGrowth) + '">' + netSign(TOTAL.netGrowth) + '</span></div></div>';
   BU_ORDER.forEach(bu => {
     const d = byBU[bu];
-    r1 += '<div class="ov-card blue-card"><div class="bu-name">' + bu + '</div><div class="big-num">' + d.active.toLocaleString() + '</div><div class="net-growth"><span class="net-label">累计净增</span><span class="' + netCls(d.netGrowth) + '">' + netSign(d.netGrowth) + '</span></div></div>';
+    r1 += '<div class="ov-card blue-card"><div class="bu-name">' + bu + '</div><div class="big-num">' + d.active.toLocaleString() + '</div><div class="net-growth"><span class="net-label">本年累计净增</span><span class="' + netCls(d.netGrowth) + '">' + netSign(d.netGrowth) + '</span></div></div>';
   });
   document.getElementById('row-active').innerHTML = r1;
 
